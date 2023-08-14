@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-import pandas as pd
 
 from src.scrape import JobSearch
 from utils.database import push_to_sqlite
@@ -18,13 +17,15 @@ headers = {
 }
 
 
-Job = JobSearch(headers, 25)
+Job = JobSearch(headers, 200)
+
+
+def main():
+    data = Job.get_all_jobs()
+    dataframe = Job.format_all_jobs(data)
+
+    push_to_sqlite(dataframe, "Jobs.db", "jobs")
 
 
 if __name__ == "__main__":
-    data = Job.search_job()
-    datframe = Job.format_all_jobs(data)
-
-    push_to_sqlite(datframe, "Jobs.db", "jobs")
-
-    datframe.to_csv("Trial.csv", index=False)
+    main()

@@ -84,7 +84,8 @@ class JobSearch(object):
 
     @property
     def query_param(self):
-        query_parameter = f"Keyword={self.search_str}&LocationName={self.location}&ResultsPerPage={self.result_no}"
+        # query_parameter = f"Keyword={self.search_str}&LocationName={self.location}&ResultsPerPage={self.result_no}"
+        query_parameter = f"Keyword={self.search_str}&ResultsPerPage={self.result_no}"
         return query_parameter
 
     def get_number_pages(self) -> int:
