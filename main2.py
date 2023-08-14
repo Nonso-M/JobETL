@@ -3,17 +3,28 @@ import os
 import pandas as pd
 
 from src.scrape import JobSearch
-from utils.database import push_to_sqlite
+from utils.database import push_to_postgres
 
 
 load_dotenv()
 
-user_agent = os.environ.get("User-Agent")
+database_name = os.environ.get("Database-Name")
 api_key = os.environ.get("Authorization-Key")
+username = os.environ.get("UserName")
+password = os.environ.get("Passworde")
+
+db_params = {
+    "database": database_name,
+    "user": username,
+    "password": password,
+    "host": "localhost",
+    "port": "5432",
+}
+
 
 headers = {
     "Host": "data.usajobs.gov",
-    "User-Agent": user_agent,
+    "User-Agent": "noname@gmail.com",
     "Authorization-Key": api_key,
 }
 
@@ -25,6 +36,6 @@ if __name__ == "__main__":
     data = Job.search_job()
     datframe = Job.format_all_jobs(data)
 
-    push_to_sqlite(datframe, "Jobs.db", "jobs")
+    push_to_postgres(datframe, db_params, "jobs")
 
     datframe.to_csv("Trial.csv", index=False)

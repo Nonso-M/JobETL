@@ -1,25 +1,47 @@
-# JobETL
 
-Dockerized ETL Pipeline: Loading Jobs from API to Database
-Overview
-This Dockerized ETL (Extract, Transform, Load) pipeline automates the process of extracting job data from a specified API, transforming it as needed, and loading it into a database. By containerizing the ETL process with Docker, this pipeline ensures consistent and isolated execution across different environments.
+# JobETL: Loading Jobs from API to Database
+## Overview
+This is an ETL (Extract, Transform, Load) pipeline that automates the process of extracting job data from a Job API, transforming it as needed, and loading it into a database. By containerizing the ETL process with Docker, this pipeline ensures consistent and isolated execution across different environments.
 
-Prerequisites
+## Prerequisites
 Before running the Dockerized ETL pipeline, ensure you have the following:
 
-Docker installed on your system.
-Docker Compose (if you're using a multi-container setup).
-Access credentials for the API.
-Access credentials for the target database (e.g., PostgreSQL, MySQL).
-Basic knowledge of Docker and Docker Compose.
-Setup
-Clone this repository to your local machine.
-Navigate to the root directory of the project.
-Configuration
-API Configuration: Open the config.ini file and provide the following details:
+- Docker installed on your system.
+- Docker Compose (if you're using a multi-container setup).
+- Access credentials for the API.
+- Access credentials if you choose to push to a Postgres Database(SQLite doesn't need Credentials).
 
-API URL: The URL of the API you're extracting job data from.
-API Parameters: Any required parameters for the API (e.g., authentication tokens, query parameters).
+## Setup
+Clone this repository to your local machine.
+```
+git clone https://github.com/Nonso-M/JobETL.git
+```
+Navigate to the root directory of the project.
+
+## Configuration
+Create a .env file in the root directory and populate it with the following credential
+### If data should be stored in a SQLite database
+```
+User-Agent= muolokwunonso@gmail.com
+Authorization-Key=<API_KEY>
+```
+### If data should be stored in a SQL or Postgres Databse
+```
+User-Agent= muolokwunonso@gmail.com
+Authorization-Key=<API_KEY>
+Database-Name= <Database Name>
+UserName= <Database Username>
+Password= <Database Password>
+DatabaseHost= <Hostname of your Postgres Server> 
+Port=<Port Number>
+```
+- Authorization-Key: This is the API key gotten from [Usa Jobs](https://developer.usajobs.gov/APIRequest/)
+- Database-Name: If you would like to send the to SQL or Postgres Database, add the Database Name.
+- UserName - Username of the database you would Like to push it to
+- Password -  Database Password
+
+- __N/B__: If you don't intend to send the Data to a SQL or Postgres Server you shuld use the first version of the enviroment file
+
 Database Configuration: If you're using a separate Docker container for the database, check the docker-compose.yml file. Adjust the environment variables for the database container based on your database's connection details (e.g., host, port, username, password).
 
 Running the Dockerized ETL Pipeline

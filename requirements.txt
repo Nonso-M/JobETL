@@ -1,0 +1,7 @@
+requests
+backoff
+pandas
+asyncio
+aiohttp
+python-dotenv
+sqlalchemy

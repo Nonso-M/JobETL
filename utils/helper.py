@@ -18,6 +18,8 @@ def filter_city(job_dict: dict, cityname: str) -> bool:
     Returns:
         bool: Boolean value indicatin the str ecistes in the job instance
     """
+
+    # Check if the city name can be found in any of the location entries
     bol = any(
         cityname in data["CityName"]
         for data in job_dict["MatchedObjectDescriptor"]["PositionLocation"]
@@ -25,10 +27,11 @@ def filter_city(job_dict: dict, cityname: str) -> bool:
     return bol
 
 
-def parse_dict(job_dict: dict, name):
+def parse_dict(job_dict: dict, name: str):
     """Extracts useful information from a job search result instance
     Args:
         job_dict (dict): A job result gotten from the search query
+        name (name): Filters the locations for locations that contain thae name passed in
     """
     # Initializes the dictionary for storing the job details
     job = dict()
