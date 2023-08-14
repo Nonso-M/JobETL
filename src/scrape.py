@@ -1,6 +1,11 @@
 import requests
 import logging
 import backoff
+import pandas as pd
+import asyncio
+import time
+from utils.helper import parse_dict, filter_city
+from utils.async_op import AsyncOperations
 
 
 # Configuring the logging
@@ -13,10 +18,61 @@ logger = logging.getLogger()
 BASE_URL = "https://data.usajobs.gov/api/"
 
 
+class FetchData:
+    """A class that fetches data using the async operations"""
+
+    def __init__(self, headers):
+        """Initializes the fetchdataclass"""
+
+        self.headers = headers
+        self.base_url = BASE_URL
+        self.async_op = AsyncOperations(self.base_url, self.headers)
+
+    def loop_pages(self, start: int, stop: int, step: int) -> tuple:
+        """Loops through pages
+
+        Args:
+            start (int): Gives where to start extracting the page
+            stop (int): Gives where to stop extracting the page
+            step (int): Gives the step to take
+
+        Returns:
+            tuple: A tuple containing two numbers
+        """
+        number = range(start, stop, step)
+        tuple_num = zip(number[:-1], number[1:])
+
+        return tuple_num
+
+    def gather_tasks(
+        self, entity: str, start: int, stop: int, step: int, num_pages
+    ) -> list:
+        """Gets all the tasks for a particular category and returns a list
+
+        Args:
+            entity (str): the remaining part of the link to the API
+            start (int): page to start pulling
+            stop (int): page to stop pulling
+            step (int): steps to take between the two numbers
+
+        Returns:
+            all_tasks (list): A list that contains all the tasks.
+        """
+
+        responses = asyncio.get_event_loop()
+        resultants = responses.run_until_complete(
+            self.async_op.get_tasks(
+                self.async_op.make_requests, range_num=num_pages, entity=entity
+            )
+        )
+
+        return resultants
+
+
 class JobSearch(object):
     base_url = BASE_URL
     location = "Chicago"
-    search_str = "data engineer"
+    search_str = "data engineering"
 
     def __init__(
         self,
@@ -47,30 +103,17 @@ class JobSearch(object):
 
         except Exception as e:
             logger.error(f"error:{e}", exc_info=True)
+            logger.error(f"Response content: {response.content}")
 
-    @staticmethod
-    def parse_dict(job_dict: dict):
-        """Extracts useful information from a job search result instance
+    def parse_all_jobs(self, job_list: list):
+        """Extracts all the information need for a job on a single page
+
         Args:
-            job_dict (dict): A job result gotten from the search query
+            job_list (_type_): List of all job search results
         """
-        job = dict()
-        job["PositionTitle"] = job_dict["MatchedObjectDescriptor"]["PositionTitle"]
-        job["PositionURI"] = job_dict["MatchedObjectDescriptor"]["PositionURI"]
+        result = [parse_dict(job, self.location) for job in job_list]
 
-        location = set(
-            [
-                location["CityName"]
-                for location in job_dict["MatchedObjectDescriptor"]["PositionLocation"]
-                if "Chicago" in location["CityName"]
-            ]
-        )
-        job["PositionLocation"] = ", ".join(list(location))
-
-        money_dict = job_dict["MatchedObjectDescriptor"]["PositionRemuneration"][0]
-        job["Salary_range"] = " - ".join(
-            [money_dict["MinimumRange"], money_dict["MaximumRange"]]
-        )
+        return result
 
     def search_job(self, page=1):
         """This method
@@ -78,16 +121,85 @@ class JobSearch(object):
             search_term (str): A string containing all the query parameter for the request
         """
         full_url = f"{self.base_url}search?{self.query_param}&Page={page}"
+        print(full_url)
         try:
             response = requests.get(full_url, headers=self.headers)
             data = response.json()
-            return data["SearchResult"]["SearchResultItems"]
+
+            # Filters for jobs that has a location in chicago and parse the results
+            filtered_list = [
+                filter_data
+                for filter_data in data["SearchResult"]["SearchResultItems"]
+                if filter_city(filter_data, self.location)
+            ]
+            # result = self.parse_all_jobs(data["SearchResult"]["SearchResultItems"])
+            result = self.parse_all_jobs(filtered_list)
+            return result
+
+        except Exception as e:
+            logger.error(f"Error:{e}", exc_info=True)
+            logger.error(f"Response content: {response.content}")
+
+    @backoff.on_exception(
+        backoff.expo, (requests.exceptions.HTTPError, KeyError), max_tries=5
+    )
+    def get_all_jobs(self):
+        total_jobs = []
+        num_pages = self.get_number_pages()
+        for page in range(1, num_pages + 1):
+            jobs = self.search_job(page=page)
+            total_jobs += jobs
+            logger.info(f"Jobs for Page {page} has successfully been parsed")
+
+        return total_jobs
+
+    def get_position_offering(self):
+        """Gets all the Positional offering and their associating codes
+        Args:
+            endpoint (str): The endpoint added to the base url
+        """
+        full_url = f"{self.base_url}codelist/positionofferingtypes"
+        try:
+            response = requests.get(full_url, headers=self.headers)
+            position_dict = response.json()
 
         except Exception as e:
             logger.error(f"Error:{e}", exc_info=True)
 
-    @backoff.on_exception(backoff.expo, requests.exceptions.HTTPError, max_tries=5)
-    def get_all_jobs(self, query_parameter: str):
-        num_pages = self.get_number_pages(query_parameter=query_parameter)
-        for page in range(1, num_pages + 1):
-            jobs = self.search_job(page=page)
+        final = {
+            entry["Code"]: entry["Value"]
+            for entry in position_dict["CodeList"][0]["ValidValue"]
+        }
+        return final
+
+    def get_position_schedule(self) -> dict[str, str]:
+        """Gets all the Positional scheduling and their associating codes
+        Args:
+            endpoint (str): The endpoint added to the base url
+        """
+        full_url = f"{self.base_url}codelist/positionscheduletypes"
+        try:
+            response = requests.get(full_url, headers=self.headers)
+            position_dict = response.json()
+
+        except Exception as e:
+            logger.error(f"Error:{e}", exc_info=True)
+
+        final = {
+            entry["Code"]: entry["Value"]
+            for entry in position_dict["CodeList"][0]["ValidValue"]
+        }
+        return final
+
+    def format_all_jobs(self, jobs_dict):
+        schedule_dict = self.get_position_schedule()
+        positional_offering = self.get_position_offering()
+
+        # Generate the dataframe and use the the dictionaries to map
+        job_df = pd.DataFrame(jobs_dict)
+        job_df["PositionOfferingType"] = job_df["PositionOfferingType"].map(
+            positional_offering
+        )
+        job_df["EmploymentType"] = job_df["EmploymentType"].map(schedule_dict)
+
+        return job_df

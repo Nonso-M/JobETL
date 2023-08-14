@@ -10,7 +10,22 @@ logging.basicConfig(
 )
 
 
-def parse_dict(job_dict: dict):
+def filter_city(job_dict: dict, cityname: str) -> bool:
+    """Filters for cities containing a particular string value
+    Args:
+        job_dict (dict): A dictionary instance of a searched result
+        cityname (str): City to filter for
+    Returns:
+        bool: Boolean value indicatin the str ecistes in the job instance
+    """
+    bol = any(
+        cityname in data["CityName"]
+        for data in job_dict["MatchedObjectDescriptor"]["PositionLocation"]
+    )
+    return bol
+
+
+def parse_dict(job_dict: dict, name):
     """Extracts useful information from a job search result instance
     Args:
         job_dict (dict): A job result gotten from the search query
@@ -25,10 +40,10 @@ def parse_dict(job_dict: dict):
         [
             location["CityName"]
             for location in job_dict["MatchedObjectDescriptor"]["PositionLocation"]
-            if "Chicago" in location["CityName"]
+            if name in location["CityName"]
         ]
     )
-    job["PositionLocation"] = ", ".join(list(location))
+    job["PositionLocation"] = "; ".join(list(location))
     logger.info("Position Name, URI and location has been successfully parsed")
 
     money_dict = job_dict["MatchedObjectDescriptor"]["PositionRemuneration"][0]
@@ -48,7 +63,7 @@ def parse_dict(job_dict: dict):
     job["Grade"] = " - ".join(
         list(set([contact_info["LowGrade"], contact_info["HighGrade"]]))
     )
-    job["ApplyOnlineUrl"] = contact_info["ApplyOnlineUrl"]
+    job["ApplyOnlineUrl"] = contact_info.get("ApplyOnlineUrl", "N/A")
     logger.info("Salary range has successfully been parsed")
 
     job["Organization_name"] = job_dict["MatchedObjectDescriptor"]["OrganizationName"]
@@ -68,10 +83,3 @@ def parse_dict(job_dict: dict):
     ]
 
     return job
-
-
-def format_all_jobs(jobs_dict, schedule: dict, pos_offering):
-    job_df = pd.DataFrame(jobs_dict)
-
-    job_df["PositionOfferingType"] = job_df["PositionOfferingType"].map(pos_offering)
-    job_df["EmploymentType"] = job_df["EmploymentType"].map(schedule)
