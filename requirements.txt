@@ -5,3 +5,5 @@ asyncio
 aiohttp
 python-dotenv
 sqlalchemy
+pytest
+pytest-vcr

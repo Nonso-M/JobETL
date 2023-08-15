@@ -4,9 +4,6 @@ import aiohttp
 import backoff
 from functools import reduce
 
-# Adding a bounding semaphore to limit the amount of requests
-limit = asyncio.BoundedSemaphore(4)
-
 
 class AsyncOperations:
     """A class of Async Operations for making requests"""
@@ -52,7 +49,6 @@ class AsyncOperations:
     async def get_tasks(self, async_op, range_num: int, entity: str):
         """
         Gathers and executes the async operations
-
         Args:
             async_op: async coroutine and function
             range_num (tuple): contains the tuple of start page and stop page
@@ -62,8 +58,7 @@ class AsyncOperations:
             response: list of tasks
         """
 
-        # retreive the start and stop pages
-
+        # retreive a list of all  pages
         count = list(range(1, range_num + 1))
 
         # gather the requests with a client session
@@ -98,16 +93,3 @@ class AsyncOperations:
         )
         all_jobs = reduce(lambda x, y: x + y, resultants)
         return all_jobs
-
-
-if __name__ == "__main__":
-    headers = {
-        "Host": "data.usajobs.gov",
-        "User-Agent": "noname@gmail.com",
-        "Authorization-Key": "gh3jLR00nD4jPbv2Z4GUEwkWfGtyQvz96Kc3JeHTDa0=",
-    }
-    BASE_URL = "https://data.usajobs.gov/api/search?"
-    entity = "Keyword=data engineering&ResultsPerPage=25&LocationName=Chicago"
-    asyncc = AsyncOperations(base_url=BASE_URL, headers=headers)
-    data = asyncc.gather_tasks(entity, 3)
-    print(len(data))

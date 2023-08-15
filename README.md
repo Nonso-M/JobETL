@@ -20,48 +20,43 @@ Navigate to the root directory of the project.
 
 ## Configuration
 Create a .env file in the root directory and populate it with the following credential
-### If data should be stored in a SQLite database
+
 ```
-User-Agent= muolokwunonso@gmail.com
-Authorization-Key=<API_KEY>
-```
-### If data should be stored in a SQL or Postgres Databse
-```
-User-Agent= muolokwunonso@gmail.com
+User-Agent= noname@gmail.com
 Authorization-Key=<API_KEY>
 Database-Name= <Database Name>
-UserName= <Database Username>
+DB-UserName= <Database Username>
 Password= <Database Password>
 DatabaseHost= <Hostname of your Postgres Server> 
 Port=<Port Number>
 ```
 - Authorization-Key: This is the API key gotten from [Usa Jobs](https://developer.usajobs.gov/APIRequest/)
-- Database-Name: If you would like to send the to SQL or Postgres Database, add the Database Name.
+- Database-Name: Database Name  Name.
 - UserName - Username of the database you would Like to push it to
 - Password -  Database Password
 
 - __N/B__: If you don't intend to send the Data to a SQL or Postgres Server you shuld use the first version of the enviroment file
 
-Database Configuration: If you're using a separate Docker container for the database, check the docker-compose.yml file. Adjust the environment variables for the database container based on your database's connection details (e.g., host, port, username, password).
+Database Configuration: The docker-compose.yml file is adjusted to fit the  Database credentials (e.g., host, port, username, password) filled in your environment variables file. If you wan to use diffferent database credentials i.e outside the container, you can change the enviroment to the new credentials you wan to use.
 
-Running the Dockerized ETL Pipeline
-Open a terminal and navigate to the root directory of the project.
-
-Build the Docker image for the ETL pipeline by running:
-
-bash
-Copy code
+# Running the Dockerized ETL Pipeline
+- Open a terminal and navigate to the root directory of the project.
+- Build the Docker image for the ETL pipeline by running:
+```
 docker build -t etl-pipeline .
 Start the Dockerized ETL pipeline by running:
+```
 
-bash
-Copy code
+```
 docker run -it etl-pipeline
-The ETL pipeline performs the following steps within the Docker container:
+```
+----
+### The ETL pipeline performs the following steps within the Docker container:
 
-Extract: Connects to the specified API and retrieves job data using the provided parameters.
-Transform: Transforms the raw job data into the desired format, applying any necessary data cleaning or preprocessing.
-Load: Loads the processed job data into the target database table.
+> Extract: Connects to the AmericanJob API and retrieves job data using the provided parameters.
+Transform: Transforms the raw job data into the desired format, applying any necessary data filtering or preprocessing.
+Load: Loads the processed job data into either a sqlite db or a Postgres DB.
+
 Data Structure
 The structure of the data stored in the database after running the Dockerized ETL pipeline will be as follows:
 
@@ -79,12 +74,8 @@ If you encounter any issues or errors while running the Dockerized ETL pipeline,
 Maintenance
 As the API or data requirements may change over time, it's essential to periodically review and update this Dockerized ETL pipeline to ensure it continues to function properly. Regularly check for updates to the API configuration, dependencies, credentials, and data transformations to maintain the pipeline's reliability.
 
-License
-[Specify the license if applicable, e.g., MIT License]
-
-Feel free to customize this README template according to your specific use case, replacing placeholders with actual information related to your API, database, Docker setup, and data structure. Providing clear instructions and documentation ensures that the Dockerized ETL pipeline can be effectively utilized and maintained by you and your team.
 
 
-
-
-
+> **Note:** This is how you write a note.
+>
+> It can have multiple lines.
