@@ -18,57 +18,6 @@ logger = logging.getLogger()
 BASE_URL = "https://data.usajobs.gov/api/"
 
 
-class FetchData:
-    """A class that fetches data using the async operations"""
-
-    def __init__(self, headers):
-        """Initializes the fetchdataclass"""
-
-        self.headers = headers
-        self.base_url = BASE_URL
-        self.async_op = AsyncOperations(self.base_url, self.headers)
-
-    def loop_pages(self, start: int, stop: int, step: int) -> tuple:
-        """Loops through pages
-
-        Args:
-            start (int): Gives where to start extracting the page
-            stop (int): Gives where to stop extracting the page
-            step (int): Gives the step to take
-
-        Returns:
-            tuple: A tuple containing two numbers
-        """
-        number = range(start, stop, step)
-        tuple_num = zip(number[:-1], number[1:])
-
-        return tuple_num
-
-    def gather_tasks(
-        self, entity: str, start: int, stop: int, step: int, num_pages
-    ) -> list:
-        """Gets all the tasks for a particular category and returns a list
-
-        Args:
-            entity (str): the remaining part of the link to the API
-            start (int): page to start pulling
-            stop (int): page to stop pulling
-            step (int): steps to take between the two numbers
-
-        Returns:
-            all_tasks (list): A list that contains all the tasks.
-        """
-
-        responses = asyncio.get_event_loop()
-        resultants = responses.run_until_complete(
-            self.async_op.get_tasks(
-                self.async_op.make_requests, range_num=num_pages, entity=entity
-            )
-        )
-
-        return resultants
-
-
 class JobSearch(object):
     base_url = BASE_URL
     location = "Chicago"
@@ -116,7 +65,7 @@ class JobSearch(object):
 
         return result
 
-    def search_job(self, page=1):
+    def search_job(self, session, page=1):
         """This method
         Args:
             search_term (str): A string containing all the query parameter for the request
@@ -124,7 +73,7 @@ class JobSearch(object):
         full_url = f"{self.base_url}search?{self.query_param}&Page={page}"
         print(full_url)
         try:
-            response = requests.get(full_url, headers=self.headers)
+            response = session.get(full_url, headers=self.headers)
             data = response.json()
 
             # Filters for jobs that has a location in chicago and parse the results
@@ -146,13 +95,14 @@ class JobSearch(object):
     )
     def get_all_jobs(self):
         total_jobs = []
-        num_pages = self.get_number_pages()
-        for page in range(1, num_pages + 1):
-            jobs = self.search_job(page=page)
-            total_jobs += jobs
-            logger.info(f"Jobs for Page {page} has successfully been parsed")
+        with requests.Session() as session:
+            num_pages = self.get_number_pages()
+            for page in range(1, num_pages + 1):
+                jobs = self.search_job(session=session, page=page)
+                total_jobs += jobs
+                logger.info(f"Jobs for Page {page} has successfully been parsed")
 
-        return total_jobs
+            return total_jobs
 
     def get_position_offering(self):
         """Gets all the Positional offering and their associating codes

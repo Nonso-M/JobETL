@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 import os
 
-from src.scrape import JobSearch
+from src.scrape import JobSearch, BASE_URL
 from utils.database import push_to_postgres
+from utils.async_op import AsyncOperations
 
 
 load_dotenv()
@@ -30,6 +31,7 @@ headers = {
 
 
 Job = JobSearch(headers, 200)
+asyncc = AsyncOperations(BASE_URL, headers=headers)
 
 
 def main():
