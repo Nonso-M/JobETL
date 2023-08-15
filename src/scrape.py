@@ -2,8 +2,6 @@ import requests
 import logging
 import backoff
 import pandas as pd
-import asyncio
-import time
 from utils.helper import parse_dict, filter_city
 from utils.async_op import AsyncOperations
 
@@ -24,12 +22,11 @@ class JobSearch(object):
     search_str = "data engineering"
 
     def __init__(
-        self,
-        header: dict[str, str],
-        result_no: int,
+        self, header: dict[str, str], result_no: int, asyncc: AsyncOperations
     ) -> None:
         self.headers = header
         self.result_no = result_no
+        self.asyncc = asyncc
 
     @property
     def query_param(self):
@@ -71,7 +68,6 @@ class JobSearch(object):
             search_term (str): A string containing all the query parameter for the request
         """
         full_url = f"{self.base_url}search?{self.query_param}&Page={page}"
-        print(full_url)
         try:
             response = session.get(full_url, headers=self.headers)
             data = response.json()
@@ -82,7 +78,6 @@ class JobSearch(object):
                 for filter_data in data["SearchResult"]["SearchResultItems"]
                 if filter_city(filter_data, self.location)
             ]
-            # result = self.parse_all_jobs(data["SearchResult"]["SearchResultItems"])
             result = self.parse_all_jobs(filtered_list)
             return result
 
@@ -93,7 +88,11 @@ class JobSearch(object):
     @backoff.on_exception(
         backoff.expo, (requests.exceptions.HTTPError, KeyError), max_tries=5
     )
-    def get_all_jobs(self):
+    def get_all_jobs(self) -> list:
+        """Loops through all pages ang gets all the jobs search result
+        Returns:
+            list: A list of all the jobs extracted
+        """
         total_jobs = []
         with requests.Session() as session:
             num_pages = self.get_number_pages()
@@ -142,7 +141,28 @@ class JobSearch(object):
         }
         return final
 
-    def format_all_jobs(self, jobs_dict):
+    def get_all_jobs_async(self):
+        num_pages = self.get_number_pages()
+        data = self.asyncc.gather_tasks(self.query_param, num_pages)
+
+        return data
+
+    def extract_data_async(self, all_jobs):
+        filtered_list = [
+            filter_data
+            for filter_data in all_jobs
+            if filter_city(filter_data, self.location)
+        ]
+        result = self.parse_all_jobs(filtered_list)
+        return result
+
+    def format_all_jobs(self, jobs_dict: dict):
+        """Receives the extracted dictionary of all jobs and formats it
+        Args:
+            jobs_dict (dict): _description_
+        Returns:
+            _type_: _description_
+        """
         schedule_dict = self.get_position_schedule()
         positional_offering = self.get_position_offering()
 

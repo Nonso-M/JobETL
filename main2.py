@@ -29,16 +29,18 @@ headers = {
     "Authorization-Key": api_key,
 }
 
-
-Job = JobSearch(headers, 200)
-asyncc = AsyncOperations(BASE_URL, headers=headers)
+# Prepping the async class for ansynchronous injection
+asyncc = AsyncOperations(f"{BASE_URL}search?", headers=headers)
+Job = JobSearch(headers, 200, asyncc)
 
 
 def main():
-    data = Job.get_all_jobs()
-    datframe = Job.format_all_jobs(data)
+    # Extracting Data from the client API asynchronously
+    data = Job.get_all_jobs_async()
+    data_list = Job.extract_data_async(data)
+    dataframe = Job.format_all_jobs(data_list)
 
-    push_to_postgres(datframe, db_params, "jobs")
+    push_to_postgres(dataframe, db_params, "jobs")
 
 
 if __name__ == "__main__":

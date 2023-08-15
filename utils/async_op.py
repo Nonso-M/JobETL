@@ -4,17 +4,15 @@ import aiohttp
 import backoff
 from functools import reduce
 
-
-limit = asyncio.BoundedSemaphore(2)
+# Adding a bounding semaphore to limit the amount of requests
+limit = asyncio.BoundedSemaphore(4)
 
 
 class AsyncOperations:
     """A class of Async Operations for making requests"""
 
-    # TODO: fix some paramters
-
     # for managing the number of concurrent requests
-    limit = asyncio.BoundedSemaphore(2)
+    limit = asyncio.BoundedSemaphore(5)
 
     def __init__(
         self,
