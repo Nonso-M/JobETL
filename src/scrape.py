@@ -1,7 +1,13 @@
+""" 
+This module contains code for orchestrating the ETL pipeline
+"""
 import requests
 import logging
 import backoff
 import pandas as pd
+from typing import Optional, Any
+
+
 from utils.helper import parse_dict, filter_city
 from utils.async_op import AsyncOperations
 
@@ -17,6 +23,8 @@ BASE_URL = "https://data.usajobs.gov/api/"
 
 
 class JobSearch(object):
+    """Class primarily built for interacting with the Job API"""
+
     base_url = BASE_URL
     location = "Chicago"
     search_str = "data engineering"
@@ -30,7 +38,6 @@ class JobSearch(object):
 
     @property
     def query_param(self):
-        # query_parameter = f"Keyword={self.search_str}&LocationName={self.location}&ResultsPerPage={self.result_no}"
         query_parameter = f"Keyword={self.search_str}&ResultsPerPage={self.result_no}"
         return query_parameter
 
@@ -39,7 +46,7 @@ class JobSearch(object):
         Args:
             query_parameter (str):A string containing all the query parameter for the request
         Returns:
-            _type_: _description_
+            int: Returns the nuber of pages for the search query
         """
         full_url = f"{self.base_url}search?{self.query_param}"
         try:
@@ -52,11 +59,10 @@ class JobSearch(object):
             logger.error(f"error:{e}", exc_info=True)
             logger.error(f"Response content: {response.content}")
 
-    def parse_all_jobs(self, job_list: list):
+    def parse_all_jobs(self, job_list: list) -> Optional[list]:
         """Extracts all the information need for a job on a single page
-
         Args:
-            job_list (_type_): List of all job search results
+            job_list (list): List of all job search results
         """
         result = [parse_dict(job, self.location) for job in job_list]
 
@@ -95,6 +101,7 @@ class JobSearch(object):
         """
         total_jobs = []
         with requests.Session() as session:
+            # Extract the total number of pages to loop through
             num_pages = self.get_number_pages()
             for page in range(1, num_pages + 1):
                 jobs = self.search_job(session=session, page=page)
@@ -104,10 +111,7 @@ class JobSearch(object):
             return total_jobs
 
     def get_position_offering(self):
-        """Gets all the Positional offering and their associating codes
-        Args:
-            endpoint (str): The endpoint added to the base url
-        """
+        """Gets all the Positional offering and their associating codes"""
         full_url = f"{self.base_url}codelist/positionofferingtypes"
         try:
             response = requests.get(full_url, headers=self.headers)
@@ -142,6 +146,10 @@ class JobSearch(object):
         return final
 
     def get_all_jobs_async(self):
+        """Gets all jobs on all pages using the asynchronous method
+        Returns:
+            _type_: _description_
+        """
         num_pages = self.get_number_pages()
         data = self.asyncc.gather_tasks(self.query_param, num_pages)
 
@@ -156,17 +164,17 @@ class JobSearch(object):
         result = self.parse_all_jobs(filtered_list)
         return result
 
-    def format_all_jobs(self, jobs_dict: dict):
+    def format_all_jobs(self, jobs_dict: list[dict]) -> pd.DataFrame:
         """Receives the extracted dictionary of all jobs and formats it
         Args:
-            jobs_dict (dict): _description_
+            jobs_dict (list): A list of dictionaries containing parsed dictionary of jobs
         Returns:
-            _type_: _description_
+            dataframe: Dataframe of rightly formatted file
         """
         schedule_dict = self.get_position_schedule()
         positional_offering = self.get_position_offering()
 
-        # Generate the dataframe and use the the dictionaries to map
+        # Generate the dataframe and use the the dictionaries to map to their actualnames
         job_df = pd.DataFrame(jobs_dict)
         job_df["PositionOfferingType"] = job_df["PositionOfferingType"].map(
             positional_offering

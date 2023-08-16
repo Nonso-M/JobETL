@@ -69,10 +69,12 @@ def parse_dict(job_dict: dict, name: str):
     job["ApplyOnlineUrl"] = contact_info.get("ApplyOnlineUrl", "N/A")
     logger.info("Salary range has successfully been parsed")
 
+    # Retrieves the Organization and Department name
     job["Organization_name"] = job_dict["MatchedObjectDescriptor"]["OrganizationName"]
     job["Organization_dept"] = job_dict["MatchedObjectDescriptor"]["DepartmentName"]
     job["JobCategory"] = job_dict["MatchedObjectDescriptor"]["JobCategory"][0]["Name"]
 
+    # Extracts the pay plan, Employment type and Offering Type
     job["Payplans"] = job_dict["MatchedObjectDescriptor"]["JobGrade"][0]["Code"]
     job["EmploymentType"] = job_dict["MatchedObjectDescriptor"]["PositionSchedule"][0][
         "Code"

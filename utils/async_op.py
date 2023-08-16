@@ -76,13 +76,9 @@ class AsyncOperations:
 
     def gather_tasks(self, entity: str, num_pages) -> list:
         """Gets all the tasks for a particular category and returns a list
-
         Args:
             entity (str): the remaining part of the link to the API
-            start (int): page to start pulling
-            stop (int): page to stop pulling
-            step (int): steps to take between the two numbers
-
+            num_pages (int): snumper of pages to make requests to
         Returns:
             all_tasks (list): A list that contains all the tasks.
         """
@@ -91,5 +87,7 @@ class AsyncOperations:
         resultants = responses.run_until_complete(
             self.get_tasks(self.make_requests, range_num=num_pages, entity=entity)
         )
+
+        # concatenate all results into a single list
         all_jobs = reduce(lambda x, y: x + y, resultants)
         return all_jobs

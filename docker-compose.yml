@@ -1,0 +1,41 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: etl-app
+    # Add any environment variables your Python app needs
+#    environment:
+#      - DB_HOST=postgres
+#      - User-Agent=muolokwunonso@gmail.com
+#      - Authorization-Key=gh3jLR00nD4jPbv2Z4GUEwkWfGtyQvz96Kc3JeHTDa0=
+#      - Database-Name=etldb
+#      - DB-UserName=etladmin
+#      - Password=mypassword
+
+ 
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: etldb
+      POSTGRES_USER: etladmin
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - "8080:80"  # Expose pgAdmin's web interface
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:

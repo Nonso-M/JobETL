@@ -7,3 +7,4 @@ python-dotenv
 sqlalchemy
 pytest
 pytest-vcr
+psycopg2-binary

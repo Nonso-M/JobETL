@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 import os
 
-from src.scrape import JobSearch
+from src.scrape import JobSearch, BASE_URL
 from utils.database import push_to_sqlite
+from utils.async_op import AsyncOperations
 
 
 load_dotenv()
@@ -17,7 +18,9 @@ headers = {
 }
 
 
-Job = JobSearch(headers, 200)
+# Prepping the async class for ansynchronous injection
+asyncc = AsyncOperations(f"{BASE_URL}search?", headers=headers)
+Job = JobSearch(headers, 200, asyncc)
 
 
 def main():

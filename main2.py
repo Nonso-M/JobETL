@@ -12,15 +12,16 @@ database_name = os.environ.get("Database-Name")
 api_key = os.environ.get("Authorization-Key")
 username = os.environ.get("DB-UserName")
 password = os.environ.get("Password")
+host = os.environ.get("DatabaseHost")
+port = os.environ.get("Port")
 
-print(username)
 
 db_params = {
     "database": database_name,
     "user": username,
     "password": password,
-    "host": "localhost",
-    "port": "5432",
+    "host": host,
+    "port": port,
 }
 
 headers = {

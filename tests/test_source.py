@@ -1,4 +1,5 @@
 import pytest
+import requests
 import pandas as pd
 from dotenv import load_dotenv
 import os
@@ -38,18 +39,23 @@ def test_class_property():
 
 @pytest.mark.vcr()
 def test_num_of_page_method():
-    """Test that the num of pages result is returned succesfully
-    Args:
-        make_dict_num_pages (_type_):FIxture that gives a sample of the result gotten
-    """
+    """Test that the num of pages result is returned succesfully"""
     num_pages = job.get_number_pages()
     assert type(num_pages) == int
 
 
 def test_num_of_page_method_error():
-    """Test that the num of pages result is returned succesfully
+    """Test that the num of pages result is returned succesfully"""
+    with pytest.raises(Exception) as excinfo:
+        num_pages = job.get_number_pages()
+
+
+@pytest.mark.vcr()
+def test_search_job_method():
+    """Test that the searchjob method of the class
     Args:
         make_dict_num_pages (_type_):FIxture that gives a sample of the result gotten
     """
-    with pytest.raises(Exception) as excinfo:
-        num_pages = job.get_number_pages()
+    with requests.Session() as session:
+        search_result = job.search_job(session)
+        assert type(search_result) == list
