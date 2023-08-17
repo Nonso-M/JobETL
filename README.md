@@ -69,7 +69,7 @@ To get the `Host Ip` run
 docker inspect <postgres_container_ID>
 ```
 The Host Ip is found under the key `IPAddress`
-----
+
 The remaining credentials are as follows
 Host name/address:  <IP gotten above>
 Port: 5432
@@ -90,7 +90,7 @@ pip install -r requirements.txt
 ``` 
 - Populate the .env as specified in [Credentials](#my-section) above **N/B** Add the API key in .env file
 - Run `main_sql.py` to push data to a SQLite database and `main2.py` to push data to a postgres Databse
-**N/B** Before running `main2.py`, add your Postgres database credentials to push it
+**N/B** Before running `main2.py`, add your Postgres database credentials to the env file to push it
 ### The ETL pipeline performs the following steps within the Docker container:
 - Extract: Connects to the AmericanJob API and retrieves job data using the provided parameters.
 - Transform: Transforms the raw job data into the desired format, applying any necessary data filtering or preprocessing.
@@ -140,6 +140,6 @@ You can configure the Dockerized ETL pipeline to run periodically using a schedu
 Troubleshooting
 If you encounter any issues or errors while running the Dockerized ETL pipeline, please refer to the error messages in the terminal. If the problem persists, feel free to reach out to [Your Contact Information] for assistance.
 
-Maintenance
+## Maintenance
 As the API or data requirements may change over time, it's essential to periodically review and update this Dockerized ETL pipeline to ensure it continues to function properly. Regularly check for updates to the API configuration, dependencies, credentials, and data transformations to maintain the pipeline's reliability.
 
