@@ -22,7 +22,6 @@ Navigate to the root directory of the project.
 Create a .env file in the root directory and populate it with the following credential
 
 ```
-User-Agent= noname@gmail.com
 Authorization-Key=<API_KEY>
 Database-Name=etldb
 DB-UserName=etladmin
@@ -56,10 +55,10 @@ pip install -r requirements.txt
 - Build and run the Docker container for the ETL pipeline by running:
 
 ```
-docker compose-up -d .
+docker-compose up -d .
 ```
 `-d`is running it in detached mode
-
+If you would like to push the data to your own Postgres Instance, you have to change the enviromental variables before building to match yours
 ## Logging Into the Postgres Database
 To access the postgres database go into your browser and search `localhost:8088` to access PGadmin
 - The login for pgadmin is as follows
@@ -89,16 +88,45 @@ Password: mypassword
 **N/B** The data is backed up in the postgres-data folder
 ### The ETL pipeline performs the following steps within the Docker container:
 
-> Extract: Connects to the AmericanJob API and retrieves job data using the provided parameters.
-Transform: Transforms the raw job data into the desired format, applying any necessary data filtering or preprocessing.
-Load: Loads the processed job data into either a sqlite db or a Postgres DB.
+- Extract: Connects to the AmericanJob API and retrieves job data using the provided parameters.
+- Transform: Transforms the raw job data into the desired format, applying any necessary data filtering or preprocessing.
+- Load: Loads the processed job data into either a sqlite db or a Postgres DB.
 
 Data Structure
 The structure of the data stored in the database after running the Dockerized ETL pipeline will be as follows:
 
-Table Name: jobs
+### Table Name: jobs
+Table Schema:
+`PositionTitle` - Title of the Job
+`PositionURI` - Link to the job posting on USAJobs
+`PositionLocation` - A list of locations for the job
+`Salary-Range` - A concatenation of the lower and upper bound of the salary available for the role
+`RateIntervalCode`- Is it PA(Per Annum) or PM(Per Month)
+`AgencyContactEmail`- Email of the agency hiring
+`AgencyContactPhone`- Phone of the agency hiring
+`Grade`- A concatenation of the maximum and minimum grade for the role
+`ApplyOnlineURL`- A direct link to the application page
+`Organization_name` - Name of Organizzation
+`Organization_dept` - Department that is hiring
+`JobCategory` -  Is it a full time, part time etc
+`ApplicationClodeDate`- When the application closes
 
-Data Schedule
+## Deployment and Scheduling
+Amazon Elastic Container Service (Amazon ECS), is a shared state, optimistic concurrency system that provides flexible scheduling capabilities for your tasks and containers. Amazon ECS provides a service scheduler for long-running tasks and applications. It also provides the ability to run tasks manually for batch jobs or single run tasks.
+EventBridge Scheduler to create a schedule.
+
+### Pros of using ECS for Scheduling and Deployment includes 
+- Fully Managed Service
+- Flexibility in Task Scheduling
+- Auto Scalability
+- Security and Networking
+
+### Cons of using ECS for Scheduling and Deployment includes 
+- Cost Optimization Management
+- Learning Curve
+- Advanced Features and Customization
+
+## Data Schedule
 You can configure the Dockerized ETL pipeline to run periodically using a scheduling tool (e.g., cron jobs, Airflow). Decide on the appropriate schedule based on the frequency of updates to the API data and the needs of your analysis.
 
 Troubleshooting
@@ -107,8 +135,3 @@ If you encounter any issues or errors while running the Dockerized ETL pipeline,
 Maintenance
 As the API or data requirements may change over time, it's essential to periodically review and update this Dockerized ETL pipeline to ensure it continues to function properly. Regularly check for updates to the API configuration, dependencies, credentials, and data transformations to maintain the pipeline's reliability.
 
-
-
-> **Note:** This is how you write a note.
->
-> It can have multiple lines.
