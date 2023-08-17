@@ -18,9 +18,9 @@ This is an ETL (Extract, Transform, Load) pipeline that automates the process of
 Before running the Dockerized ETL pipeline, ensure you have the following:
 
 - Docker installed on your system.
-- Docker Compose also installed.
+- Docker Compose should also  be installed.
 - Access credentials for the API.
-- DataBase Credentials if you want to push it to your own PostGres DB.
+- DataBase Credentials if you want to push it to your own Postgres Database.
 
 <a id="setup"></a>
 ## Setup
@@ -43,14 +43,14 @@ DatabaseHost=postgres
 Port=5432
 
 ```
-Database Configuration: The docker-compose.yml file is adjusted to fit the  Database credentials (e.g., host, port, username, password) filled in your environment variables file. If you wan to use diffferent database credentials i.e outside the container, you can change the enviroment to the new credentials you wan to use.
+**Database Configuration**: The docker-compose.yml file is adjusted to fit the  Database credentials (e.g., host, port, username, password) filled in your environment variables file. If you want to use diffferent database credentials i.e outside the container, you can change the enviroment variables(`DB-UserName`, `DatabseHost`,`Password`, `DatabaseHost`, `Port`) to the new credentials you wan to use.
 
 - Authorization-Key: This is the API key gotten from [Usa Jobs](https://developer.usajobs.gov/APIRequest/)
 - Database-Name: Database Name  Name.
 - UserName - Username of the database you would Like to push it to
 - Password -  Database Password
 
-- __N/B__: If you don't intend to send the Data to a personal Posgres Server when running locally change the `DB-UserName`, `DatabseHost`,`Password`, `DatabaseHost`, `Port` to your own details
+- __N/B__: If you don't intend to send the Data to a personal Posgres Server when running locally also change the `DB-UserName`, `DatabseHost`,`Password`, `DatabaseHost`, `Port` to your own details
 
 <a id="docker"></a>
 
@@ -71,8 +71,8 @@ To access the postgres database go into your browser and search `localhost:8080`
 `EMAIL`: admin@example.com
 `PASSWORD`: adminpassword
 
-To access the table data you have to register the database on PGadmin. To do this;
-- Right click on `Servers` and register new database
+To access the table data you have to register the Database on PGadmin. To do this;
+- Right click on `Servers` and click register new database
 - Retieve the Host name by running the following steps on the terminal
 ```
 docker ps
