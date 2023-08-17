@@ -7,7 +7,7 @@ This is an ETL (Extract, Transform, Load) pipeline that automates the process of
 Before running the Dockerized ETL pipeline, ensure you have the following:
 
 - Docker installed on your system.
-- Docker Compose.
+- Docker Compose also installed.
 - Access credentials for the API.
 - DataBase Credentials if you want to push it to your own PostGres DB.
 
@@ -97,19 +97,23 @@ The structure of the data stored in the database after running the Dockerized ET
 
 ### Table Name: jobs
 Table Schema:
-`PositionTitle` - Title of the Job
-`PositionURI` - Link to the job posting on USAJobs
-`PositionLocation` - A list of locations for the job
-`Salary-Range` - A concatenation of the lower and upper bound of the salary available for the role
-`RateIntervalCode`- Is it PA(Per Annum) or PM(Per Month)
-`AgencyContactEmail`- Email of the agency hiring
-`AgencyContactPhone`- Phone of the agency hiring
-`Grade`- A concatenation of the maximum and minimum grade for the role
-`ApplyOnlineURL`- A direct link to the application page
-`Organization_name` - Name of Organizzation
-`Organization_dept` - Department that is hiring
-`JobCategory` -  Is it a full time, part time etc
-`ApplicationClodeDate`- When the application closes
+| Column Name        | Description   |
+| ------------- |:-------------:|
+| `PositionTitle`| Title of the Job Position |
+| `PositionURI`| Link to the job posting on USAJobs |
+| `PositionLocation` | A list of locations for the job     |
+| `Salary-Range`|A concatenation of the lower and upper bound of the salary available for the role|
+|`RateIntervalCode` | Is it PA(Per Annum) or PM(Per Month) |
+|`AgencyContactEmail` |Email of the agency hiring |
+| `AgencyContactPhone`|Phone of the agency hiring|
+| `Grade` |A concatenation of the maximum and minimum grade for the role|
+|`ApplyOnlineURL`|A direct link to the application page|
+| `Organization_name`| Name of Organization |
+| `Organization_dept` |Department that is hiring|
+|`JobCategory`  | Is it a full time, part time etc|
+|`ApplicationClodeDate` |When the application closes|
+| `PositionStartDate`|When successful candidates are expected to resume|
+| `PositionOfferingType` | Work Types category |
 
 ## Deployment and Scheduling
 Amazon Elastic Container Service (Amazon ECS), is a shared state, optimistic concurrency system that provides flexible scheduling capabilities for your tasks and containers. Amazon ECS provides a service scheduler for long-running tasks and applications. It also provides the ability to run tasks manually for batch jobs or single run tasks.
