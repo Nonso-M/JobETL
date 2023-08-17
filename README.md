@@ -28,7 +28,11 @@ Clone this repository to your local machine.
 ```
 git clone https://github.com/Nonso-M/JobETL.git
 ```
-Navigate to the root directory of the project.
+Navigate to the root directory of the project. create a folder in the root directory **postgres-data**
+using the following command
+```bash
+mkdir postgres-data
+```
 
 <a id="my-section"></a>
 ## Configuration
