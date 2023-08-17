@@ -8,8 +8,7 @@ services:
     # Add any environment variables your Python app needs
 #    environment:
 #      - DB_HOST=postgres
-#      - User-Agent=muolokwunonso@gmail.com
-#      - Authorization-Key=gh3jLR00nD4jPbv2Z4GUEwkWfGtyQvz96Kc3JeHTDa0=
+#      - User-Agent=noname@gmail.com
 #      - Database-Name=etldb
 #      - DB-UserName=etladmin
 #      - Password=mypassword

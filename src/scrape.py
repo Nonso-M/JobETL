@@ -68,10 +68,11 @@ class JobSearch(object):
 
         return result
 
-    def search_job(self, session, page=1):
-        """This method
+    def search_job(self, session, page: int = 1) -> Optional[list]:
+        """This method searches for a particular job contained in the query parameter
         Args:
-            search_term (str): A string containing all the query parameter for the request
+            session (str): A request session object
+            page(int) : Results are in several pages, page indicates the current page
         """
         full_url = f"{self.base_url}search?{self.query_param}&Page={page}"
         try:
@@ -110,6 +111,16 @@ class JobSearch(object):
 
             return total_jobs
 
+    def get_all_jobs_async(self):
+        """Gets all jobs on all pages using the asynchronous method
+        Returns:
+            _type_: _description_
+        """
+        num_pages = self.get_number_pages()
+        data = self.asyncc.gather_tasks(self.query_param, num_pages)
+
+        return data
+
     def get_position_offering(self):
         """Gets all the Positional offering and their associating codes"""
         full_url = f"{self.base_url}codelist/positionofferingtypes"
@@ -145,17 +156,14 @@ class JobSearch(object):
         }
         return final
 
-    def get_all_jobs_async(self):
-        """Gets all jobs on all pages using the asynchronous method
+    def extract_data_async(self, all_jobs) -> list:
+        """This is a helper method that is used for the asynchronous version of request.
+           This function parses all results to return job info needed
+        Args:
+            all_jobs (list): A list of all jobs gotten from the chat result
         Returns:
             _type_: _description_
         """
-        num_pages = self.get_number_pages()
-        data = self.asyncc.gather_tasks(self.query_param, num_pages)
-
-        return data
-
-    def extract_data_async(self, all_jobs):
         filtered_list = [
             filter_data
             for filter_data in all_jobs
