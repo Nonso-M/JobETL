@@ -1,8 +1,19 @@
+# Table of Content
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Setup](#setup)
+4. [Running the Dockerized ETL Pipeline](#docker)
+5. [Running the pipeline Locally on your Machine](#locally)
+6. [Table-Schema](#table-schema)
+7. [Deploy and Scheduling](#deployment)
+8. [Troubleshooting and Maintenance](#trouble)
 
 # JobETL: Loading Jobs from API to Database
+<a id="overview"></a>
 ## Overview
 This is an ETL (Extract, Transform, Load) pipeline that automates the process of extracting job data from a Job API, transforming it as needed, and loading it into a database. By containerizing the ETL process with Docker, this pipeline ensures consistent and isolated execution across different environments.
 
+<a id="prerequisites"></a>
 ## Prerequisites
 Before running the Dockerized ETL pipeline, ensure you have the following:
 
@@ -11,6 +22,7 @@ Before running the Dockerized ETL pipeline, ensure you have the following:
 - Access credentials for the API.
 - DataBase Credentials if you want to push it to your own PostGres DB.
 
+<a id="setup"></a>
 ## Setup
 Clone this repository to your local machine.
 ```
@@ -40,6 +52,8 @@ Database Configuration: The docker-compose.yml file is adjusted to fit the  Data
 
 - __N/B__: If you don't intend to send the Data to a personal Posgres Server when running locally change the `DB-UserName`, `DatabseHost`,`Password`, `DatabaseHost`, `Port` to your own details
 
+<a id="docker"></a>
+
 # Running the Dockerized ETL Pipeline
 - Open a terminal and navigate to the root directory of the project.
 - Build and run the Docker container for the ETL pipeline by running:
@@ -51,7 +65,7 @@ docker-compose up --build -d .
 `-d`is running it in detached mode
 
 ## Logging Into the Postgres Database
-> If you are using the database initialized within the container, use to following stepsto access the data
+> If you are using the database initialized within the container, use to following steps to access the data.
 To access the postgres database go into your browser and search `localhost:8080` to access PGadmin
 - The login for pgadmin is as follows
 `EMAIL`: admin@example.com
@@ -81,6 +95,7 @@ Table is found as you trasverse the tree (<db_name>-etldb-schema-jobs)
 
 **N/B** The data is backed up in the postgres-data folder
 
+<a id="locally"></a>
 # Running the pipeline Locally on your Machine
 To run the pipeline locally on your machine carry out the following steps
 - Create a virtual Environment
@@ -98,6 +113,8 @@ pip install -r requirements.txt
 
 Data Structure
 The structure of the data stored in the database after running the Dockerized ETL pipeline will be as follows:
+
+<a id="table-schema"></a>
 
 ### Table Name: jobs
 Table Schema:
@@ -119,6 +136,7 @@ Table Schema:
 | `PositionStartDate`|When successful candidates are expected to resume|
 | `PositionOfferingType` | Work Types category |
 
+<a id="deployment"></a>
 ## Deployment and Scheduling
 Amazon Elastic Container Service (Amazon ECS), is a shared state, optimistic concurrency system that provides flexible scheduling capabilities for your tasks and containers. Amazon ECS provides a service scheduler for long-running tasks and applications. It also provides the ability to run tasks manually for batch jobs or single run tasks.
 EventBridge Scheduler to create a schedule.
@@ -134,10 +152,8 @@ EventBridge Scheduler to create a schedule.
 - Learning Curve
 - Advanced Features and Customization
 
-## Data Schedule
-You can configure the Dockerized ETL pipeline to run periodically using a scheduling tool (e.g., cron jobs, Airflow). Decide on the appropriate schedule based on the frequency of updates to the API data and the needs of your analysis.
-
-Troubleshooting
+<a id="trouble"></a>
+## Troubleshooting
 If you encounter any issues or errors while running the Dockerized ETL pipeline, please refer to the error messages in the terminal. If the problem persists, feel free to reach out to [Your Contact Information] for assistance.
 
 ## Maintenance
