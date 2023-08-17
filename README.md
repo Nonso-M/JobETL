@@ -72,8 +72,9 @@ docker-compose up --build -d .
 > If you are using the database initialized within the container, use to following steps to access the data.
 To access the postgres database go into your browser and search `localhost:8080` to access PGadmin
 - The login for pgadmin is as follows
-`EMAIL`: admin@example.com
-`PASSWORD`: adminpassword
+
+- `EMAIL`: admin@example.com
+- `PASSWORD`: adminpassword
 
 To access the table data you have to register the Database on PGadmin. To do this;
 - Right click on `Servers` and click register new database
@@ -89,11 +90,11 @@ docker inspect <postgres_container_ID>
 The Host Ip is found under the key `IPAddress`
 
 The remaining credentials are as follows
-Host name/address:  <IP gotten above>
-Port: 5432
-Maintenance Database: etldb
-Username: etladmin
-Password: mypassword
+- Host name/address:  <IP gotten above>
+- Port: 5432
+- Maintenance Database: etldb
+- Username: etladmin
+- Password: mypassword
 
 Table is found as you trasverse the tree (<db_name>-etldb-schema-jobs)
 
