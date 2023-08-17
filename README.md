@@ -46,7 +46,7 @@ Database Configuration: The docker-compose.yml file is adjusted to fit the  Data
 > If you would like to push the data to your own Postgres Instance, you have to change the enviromental variables to match your database credentials before building the docker image 
 
 ```
-docker-compose up -d .
+docker-compose up --build -d .
 ```
 `-d`is running it in detached mode
 
@@ -77,7 +77,7 @@ Maintenance Database: etldb
 Username: etladmin
 Password: mypassword
 
-Table is found as you trasverse the tree ()
+Table is found as you trasverse the tree (<db_name>-etldb-schema-jobs)
 
 **N/B** The data is backed up in the postgres-data folder
 
