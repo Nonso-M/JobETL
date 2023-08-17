@@ -28,12 +28,12 @@ Clone this repository to your local machine.
 ```
 git clone https://github.com/Nonso-M/JobETL.git
 ```
-Navigate to the root directory of the project. create a folder in the root directory **postgres-data**
+Navigate to the root directory of the project. create a folder in the root directory **postgres-data**. 
 using the following command
 ```bash
 mkdir postgres-data
 ```
-
+This data would be used to store the data from the database even when the container goes down
 <a id="my-section"></a>
 ## Configuration
 Create a .env file in the root directory and populate it with the following credential
